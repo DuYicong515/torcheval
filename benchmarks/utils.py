@@ -96,7 +96,7 @@ def get_time(
             "use_torchmetrics": use_torchmetrics,
         },
     )
-    result = timer.timeit(3)
+    result = timer.timeit(20)
     rank_0_print(f"Average time spent of 20 runs: {result.mean}")
 
 
