@@ -4,6 +4,8 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  # or manually trigger it
+  workflow_dispatch:
 
 jobs:
   unit_tests:
