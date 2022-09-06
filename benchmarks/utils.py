@@ -70,11 +70,9 @@ def get_benchmark_stats(
     update_kwargs: Dict[str, Any],
     use_torchmetrics: bool = False,
 ):
-    metric.reset()
     get_gpu_memory(
         metric, num_batches, compute_interval, update_kwargs, use_torchmetrics
     )
-    metric.reset()
     get_time(metric, num_batches, compute_interval, update_kwargs, use_torchmetrics)
 
 
@@ -86,7 +84,8 @@ def get_time(
     use_torchmetrics: bool = False,
 ):
     timer = benchmark.Timer(
-        setup="from __main__ import run_metric_computation",
+        setup="from __main__ import run_metric_computation\n"
+        "metric.reset()",
         stmt="run_metric_computation(metric, num_batches, compute_interval, update_kwargs, use_torchmetrics)",
         globals={
             "metric": metric,
@@ -96,7 +95,7 @@ def get_time(
             "use_torchmetrics": use_torchmetrics,
         },
     )
-    result = timer.timeit(3)
+    result = timer.timeit(20)
     rank_0_print(f"Average time spent of 20 runs: {result.mean}")
 
 
