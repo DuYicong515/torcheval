@@ -335,7 +335,7 @@ Its class version is <a class="reference internal" href="torcheval.metrics.html#
 
 <dl class="py function">
 <dt class="sig sig-object py" id="torcheval.metrics.functional.binary_auroc">
-<span class="sig-prename descclassname"><span class="pre">torcheval.metrics.functional.</span></span><span class="sig-name descname"><span class="pre">binary_auroc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></span><a class="headerlink" href="#torcheval.metrics.functional.binary_auroc" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">torcheval.metrics.functional.</span></span><span class="sig-name descname"><span class="pre">binary_auroc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fbgemm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></span><a class="headerlink" href="#torcheval.metrics.functional.binary_auroc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute AUROC, which is the area under the ROC Curve, for binary classification.
 Its class version is <code class="docutils literal notranslate"><span class="pre">torcheval.metrics.BinaryAUROC</span></code>.</p>
 <dl class="field-list simple">
@@ -346,6 +346,11 @@ It should be predicted label, probabilities or logits with shape of (num_tasks, 
 <li><p><strong>target</strong> (<em>Tensor</em>) – Tensor of ground truth labels with shape of (num_tasks, n_sample) or (n_sample, ).</p></li>
 <li><p><strong>num_tasks</strong> (<em>int</em>) – Number of tasks that need BinaryAUROC calculation. Default value
 is 1. BinaryAUROC for each task will be calculated independently.</p></li>
+<li><p><strong>use_fbgemm</strong> (<em>bool</em>) – If set to True, use <code class="docutils literal notranslate"><span class="pre">fbgemm_gpu.metrics.auc</span></code> (a
+hand fused kernel).  FBGEMM AUC is an approximation of AUC. It does
+not mask data in case that input values are redundant. For the
+highly redundant input case, FBGEMM AUC can give a significantly
+different result.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1567,6 +1572,51 @@ set of labels in target.</p></li>
 </div>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="torcheval.metrics.functional.weighted_calibration">
+<span class="sig-prename descclassname"><span class="pre">torcheval.metrics.functional.</span></span><span class="sig-name descname"><span class="pre">weighted_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v1.12)"><span class="pre">Tensor</span></a></span></span><a class="headerlink" href="#torcheval.metrics.functional.weighted_calibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted calibration metric. When weight is not provided, it calculates the unweighted calibration.
+Its class version is <a class="reference internal" href="torcheval.metrics.html#torcheval.metrics.WeightedCalibration" title="torcheval.metrics.WeightedCalibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torcheval.metrics.WeightedCalibration</span></code></a>.</p>
+<p>weighted_calibration = sum(input * weight) / sum(target * weight)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<em>Tensor</em>) – Tensor of input values.</p></li>
+<li><p><strong>target</strong> (<em>Tensor</em>) – Tensor of binary targets</p></li>
+<li><p><strong>weight</strong> (<em>optional</em>) – Float or Int or Tensor of input weights. It is default to 1.0. If weight is a Tensor, its size should match the input tensor size.</p></li>
+<li><p><strong>num_tasks</strong> (<em>int</em>) – Number of tasks that need weighted_calibration calculation. Default value
+is 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The return value of weighted calibration for each task (num_tasks,).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If value of weight is neither a <code class="docutils literal notranslate"><span class="pre">float</span></code> nor a <code class="docutils literal notranslate"><span class="pre">int</span></code> nor a <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> that matches the input tensor size.</p>
+</dd>
+</dl>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">torcheval.metrics.functional</span> <span class="kn">import</span> <span class="n">weighted_calibration</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weighted_calibration</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]),</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+<span class="go">tensor([1.2])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weighted_calibration</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]),</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]))</span>
+<span class="go">tensor([1.1321])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weighted_calibration</span><span class="p">(</span>
+<span class="go">        torch.tensor([[0.8, 0.4], [0.8, 0.7]]),</span>
+<span class="go">        torch.tensor([[1, 1], [0, 1]]),</span>
+<span class="go">        num_tasks=2,</span>
+<span class="go">    ),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tensor</span><span class="p">([</span><span class="mf">0.6000</span><span class="p">,</span> <span class="mf">1.5000</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 
 
@@ -1703,19 +1753,43 @@ set of labels in target.</p></li>
           </ul>
         </div>
 
-        <div class="footer-links-col follow-us-col">
+        <div class="footer-links-col">
           <ul>
-            <li class="list-title">Stay Connected</li>
-          </ul>
-
-          <div class="footer-social-icons">
-            <a href="https://www.facebook.com/pytorch" target="_blank" class="facebook"></a>
-            <a href="https://twitter.com/pytorch" target="_blank" class="twitter"></a>
-            <a href="https://www.youtube.com/pytorch" target="_blank" class="youtube"></a>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
           </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
         </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
       </div>
-    </div>
+     </div>
+
   </footer>
 
   <div class="cookie-banner-wrapper">
